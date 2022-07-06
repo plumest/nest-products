@@ -27,4 +27,28 @@ export class ProductsService {
     });
     return data;
   }
+
+  async remove(id: string): Promise<void> {
+    await this.productsRepository.delete(id);
+  }
+
+  async editQuantity(id: string, quantity: number) {
+    const data = await this.dataSource.transaction(async (manager) => {
+      const response = await manager
+        .getRepository(Product)
+        .update(id, { quantity });
+      return response;
+    });
+    return data;
+  }
+
+  async editProduct(id: string, name: string, price: number, quantity: number) {
+    const data = await this.dataSource.transaction(async (manager) => {
+      const response = await manager
+        .getRepository(Product)
+        .update(id, { name, price, quantity });
+      return response;
+    });
+    return data;
+  }
 }
