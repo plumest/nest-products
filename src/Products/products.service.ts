@@ -15,6 +15,10 @@ export class ProductsService {
     return this.productsRepository.find();
   }
 
+  findOne(id: string): Promise<Product> {
+    return this.productsRepository.findOne({ where: { id: id } });
+  }
+
   async createOne(name: string, price: number, quantity: number) {
     const newProduct = { name, price, quantity };
     const data = await this.dataSource.transaction(async (manager) => {
