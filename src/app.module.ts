@@ -5,6 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './Products/products.entity';
 import { ProductsModule } from './Products/products.module';
 import { DataSource } from 'typeorm';
+import { ProductsRepository } from './Products/products.repository';
+import { KafkaModule } from './kafka/kafka.module';
+import { TestConsumer } from './test.consumer';
 
 @Module({
   imports: [
@@ -21,10 +24,12 @@ import { DataSource } from 'typeorm';
         trustServerCertificate: true,
       },
     }),
+    // TypeOrmModule.forFeature([Product]),
     ProductsModule,
+    KafkaModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TestConsumer],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

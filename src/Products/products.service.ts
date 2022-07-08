@@ -1,18 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { ConsumerService } from 'src/kafka/consumer.service';
+import { ProducerService } from 'src/kafka/producer.service';
+import { Connection, DataSource, Repository } from 'typeorm';
 import { Product } from './products.entity';
+import { ProductsRepository } from './products.repository';
 
 @Injectable()
 export class ProductsService {
   constructor(
+    private readonly producerService: ProducerService,
+    private readonly consumerService: ConsumerService,
     @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
-    private dataSource: DataSource,
+    private readonly productsRepository: Repository<Product>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  findAll(): Promise<Product[]> {
+  async findAll(): Promise<any> {
     return this.productsRepository.find();
+    // const data = await this.productsRepository.find();
+    // const topics = data.map((product) => product.name);
+    // return this.consumerService.consume({ topics }, {});
   }
 
   findOne(id: string): Promise<Product> {
@@ -25,6 +33,11 @@ export class ProductsService {
       const response = await manager.getRepository(Product).save(newProduct);
       return response;
     });
+    await this.producerService.produce({
+      topic: name,
+      messages: [{ value: JSON.stringify({ price, quantity }) }],
+    });
+    // const data = await this.productsRepository.createOne(newProduct);
     return data;
   }
 
